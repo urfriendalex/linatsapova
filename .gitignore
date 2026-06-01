@@ -1,9 +1,25 @@
+# Dependencies
 node_modules/
+
+# SvelteKit
 .svelte-kit/
 build/
 
+# Sanity Studio
+dist/
+.sanity/
+
+# Environment (never commit secrets)
 .env
 .env.*
 !.env.example
 
+# OS / editor
 .DS_Store
+*.log
+
+# Local tooling
+.playwright-cli/
+
+# Vercel (link metadata is local; vercel.json is committed)
+.vercel

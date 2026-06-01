@@ -1,35 +1,81 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { page } from '$app/state';
-  import { goto } from '$app/navigation';
+  import { afterNavigate } from '$app/navigation';
+  import { setFocusImageParam } from '$lib/focus-url';
   import ResponsiveImage from '$lib/components/ResponsiveImage.svelte';
   import { setLightboxSource } from '$lib/lightbox';
-  import { portfolio } from '$lib/state.svelte';
+  import { readPrerenderPayload } from '$lib/prerender-payload';
+  import { portfolio, syncPortfolioGallery } from '$lib/state.svelte';
+  import type { Project } from '$lib/types';
+
+  const PAYLOAD_ID = 'project-data';
+
   let { data } = $props();
-  let project = $derived(data.project);
+  let projectState = $state<Project | null>(data?.project ?? readPrerenderPayload<Project>(PAYLOAD_ID));
+  const project = $derived(projectState);
+
+  $effect.pre(() => {
+    if (data?.project) projectState = data.project;
+    else if (!projectState) projectState = readPrerenderPayload<Project>(PAYLOAD_ID);
+  });
+
+  function syncFromUrl() {
+    const id = page.url.searchParams.get('image') ?? '';
+    portfolio.activeImage = id;
+    portfolio.transitionPhase = id ? 'open' : 'idle';
+  }
 
   $effect(() => {
+    if (!project?.gallery) return;
     portfolio.activeProject = project.slug;
     portfolio.gallery = project.gallery;
-    portfolio.activeImage = page.url.searchParams.get('image') ?? '';
-    portfolio.transitionPhase = portfolio.activeImage ? 'open' : 'idle';
   });
+
+  onMount(() => {
+    syncPortfolioGallery('.gallery button');
+    if (!project) return;
+    portfolio.activeProject = project.slug;
+    syncFromUrl();
+    const onPopState = () => syncFromUrl();
+    addEventListener('popstate', onPopState);
+    return () => removeEventListener('popstate', onPopState);
+  });
+
+  afterNavigate(syncFromUrl);
+
   function focus(id: string, event: MouseEvent) {
+    syncPortfolioGallery('.gallery button');
     setLightboxSource((event.currentTarget as HTMLButtonElement).querySelector('img') ?? undefined);
-    goto(`/projects/${project.slug}?image=${id}`, { noScroll: true, keepFocus: true });
+    portfolio.transitionPhase = 'opening';
+    portfolio.activeImage = id;
+    setFocusImageParam(id);
   }
 </script>
-<svelte:head><title>{project.title} — Lina Tsapova</title></svelte:head>
-<section class="project-head">
-  <div><p>{project.year} — Project</p><h1>{project.title}</h1><p class="summary">{project.summary}</p></div>
-  <ResponsiveImage image={project.cover} sizes="(max-width: 800px) 100vw, 52vw" eager transitionName={`project-${project.slug}`} />
-</section>
-<section class="gallery" aria-label={`${project.title} gallery`}>
-  {#each project.gallery as image, index}
-    <button class:wide={index % 3 === 0} onclick={(event) => focus(image.id, event)} aria-label={`Explore ${image.alt}`}>
-      <ResponsiveImage {image} sizes={index % 3 === 0 ? '(max-width: 720px) 100vw, 70vw' : '(max-width: 720px) 100vw, 42vw'} />
-    </button>
-  {/each}
-</section>
+
+<svelte:head><title>{project?.title ?? 'Project'} — Lina Tsapova</title></svelte:head>
+
+<div id={PAYLOAD_ID} hidden aria-hidden="true">{data?.projectPayload ?? ''}</div>
+
+{#if project}
+  <section class="project-head">
+    <div><p>{project.year} — Project</p><h1>{project.title}</h1><p class="summary">{project.summary}</p></div>
+    <ResponsiveImage image={project.cover} sizes="(max-width: 800px) 100vw, 52vw" eager transitionName={`project-${project.slug}`} />
+  </section>
+  <section class="gallery" aria-label={`${project.title} gallery`}>
+    {#each project.gallery as image, index}
+      <button
+        class:wide={index % 3 === 0}
+        data-image-id={image.id}
+        onclick={(event) => focus(image.id, event)}
+        aria-label={`Explore ${image.alt}`}
+      >
+        <ResponsiveImage {image} sizes={index % 3 === 0 ? '(max-width: 720px) 100vw, 70vw' : '(max-width: 720px) 100vw, 42vw'} />
+      </button>
+    {/each}
+  </section>
+{/if}
+
 <style>
   .project-head { align-items: end; display: grid; gap: 50px; grid-template-columns: 1fr 1.3fr; padding: 100px 30px 150px; }
   p,h1 { margin: 0; }.project-head p:first-child{color:var(--muted);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase}

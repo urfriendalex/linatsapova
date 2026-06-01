@@ -1,25 +1,34 @@
 <script lang="ts">
   import ResponsiveImage from '$lib/components/ResponsiveImage.svelte';
-  import { workCategories } from '$lib/data';
 
-  const categories = [
-    { slug: 'modeling', ...workCategories.modeling, image: workCategories.modeling.images[0] },
-    { slug: 'photography', ...workCategories.photography, image: workCategories.photography.images[0] }
-  ];
+  let { data } = $props();
+
+  const categories = $derived(
+    data.workCategories.map((category) => ({
+      ...category,
+      image: category.images[0] ?? null
+    }))
+  );
+
+  const landingLines = $derived(data.siteSettings.landingStatement.split('\n'));
 </script>
 
-<svelte:head><title>Lina Tsapova — Modeling and Photography</title></svelte:head>
+<svelte:head><title>{data.siteSettings.siteTitle}</title></svelte:head>
 
 <section class="hero">
   <div class="hero-copy">
     <p>Modeling and photography</p>
-    <h1>Presence,<br />observed.</h1>
+    <h1>
+      {#each landingLines as line, index}
+        {line}{#if index < landingLines.length - 1}<br />{/if}
+      {/each}
+    </h1>
     <a class="explore" href="#works"><span>Explore works</span><i aria-hidden="true">↓</i></a>
   </div>
   <div class="hero-image">
-    <ResponsiveImage image={workCategories.modeling.images[0]} sizes="(max-width: 760px) 100vw, 48vw" eager />
+    <ResponsiveImage image={data.siteSettings.heroImage} sizes="(max-width: 760px) 100vw, 48vw" eager />
   </div>
-  <p class="hero-note">Warsaw — available worldwide</p>
+  <p class="hero-note">{data.siteSettings.heroNote}</p>
 </section>
 
 <section class="works" id="works" aria-labelledby="works-title">
@@ -47,7 +56,7 @@
 
 <footer>
   <p>For commissions, collaborations, and selected inquiries</p>
-  <a href="mailto:hello@linatsapova.com">hello@linatsapova.com</a>
+  <a href="mailto:{data.profile.email}">{data.profile.email}</a>
   <div><span>Instagram</span><span>Threads</span><span>Warsaw</span></div>
 </footer>
 
@@ -61,7 +70,8 @@
   .explore i { font-size: 1.05rem; font-style: normal; transition: transform .24s cubic-bezier(.23,1,.32,1); }
   .explore:hover i, .explore:focus-visible i { transform: translateY(5px); }
   .hero-image { min-height: 0; overflow: hidden; }
-  .hero-image :global(img) { height: 100%; object-fit: cover; outline: 1px solid rgba(0,0,0,.1); width: 100%; }
+  .hero-image :global(img),
+  .hero-image :global(.skeleton) { height: 100%; object-fit: cover; outline: 1px solid rgba(0,0,0,.1); width: 100%; }
   .hero-note { bottom: 34px; left: 30px; position: absolute; }
   .works { padding: clamp(110px,14vw,190px) 30px clamp(120px,15vw,210px); scroll-margin-top: 100px; }
   .section-intro { display: flex; justify-content: space-between; margin-bottom: 62px; }
@@ -69,7 +79,8 @@
   .category-grid { display: grid; gap: 16px; grid-template-columns: repeat(2,minmax(0,1fr)); }
   .category { color: inherit; display: block; text-decoration: none; }
   .category-image { aspect-ratio: 1 / 1.12; display: block; overflow: hidden; }
-  .category-image :global(img) { height: 100%; object-fit: cover; outline: 1px solid rgba(0,0,0,.1); transition: transform .5s cubic-bezier(.23,1,.32,1); width: 100%; }
+  .category-image :global(img),
+  .category-image :global(.skeleton) { height: 100%; object-fit: cover; outline: 1px solid rgba(0,0,0,.1); transition: transform .5s cubic-bezier(.23,1,.32,1); width: 100%; }
   .category-meta { align-items: end; display: flex; justify-content: space-between; padding-top: 18px; }
   .category-meta span { display: grid; gap: 8px; }
   small { color: var(--muted); font-size: .62rem; font-variant-numeric: tabular-nums; letter-spacing: .08em; }
