@@ -493,6 +493,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    gap: var(--chrome-pad-y);
     margin: 0;
     max-height: 0;
     min-height: 0;
@@ -509,7 +510,7 @@
 
   .menu-shell.expanded .menu-body {
     max-height: var(--menu-body-max);
-    padding-bottom: 16px;
+    padding-bottom: var(--chrome-pad-y);
     pointer-events: auto;
     transition:
       max-height 0.42s var(--menu-ease),
@@ -526,7 +527,7 @@
 
   .menu-link {
     display: block;
-    font-size: clamp(3.2rem, 6.8vw, 5.6rem);
+    font-size: clamp(2.24rem, 4.76vw, 3.92rem);
     font-weight: 400;
     letter-spacing: -0.085em;
     line-height: 0.9;
@@ -535,6 +536,7 @@
     text-decoration: none;
     text-transform: uppercase;
     text-wrap: balance;
+    transition: .23s all var(--menu-ease);
   }
 
   .menu-link-label {
@@ -568,7 +570,6 @@
   .socials a {
     align-items: center;
     display: flex;
-    min-height: 44px;
     text-decoration: none;
     transition: color 0.16s var(--menu-ease-out);
   }
@@ -582,7 +583,6 @@
 
   .menu-footer p {
     margin: 0;
-    min-height: 44px;
     display: flex;
     align-items: center;
     font-variant-numeric: tabular-nums;
@@ -656,7 +656,8 @@
     }
 
     .menu-link {
-      font-size: clamp(2.6rem, 12vw, 3.6rem);
+      font-size: clamp(1.82rem, 8.4vw, 2.52rem);
+ 
     }
 
     .menu-body {

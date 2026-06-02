@@ -64,7 +64,7 @@
 
 <style>
   .project-head { align-items: end; display: grid; gap: 50px; grid-template-columns: 1fr 1.3fr; padding: 100px 30px 150px; }
-  p,h1 { margin: 0; }.project-head p:first-child{color:var(--muted);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase}
+  p,h1 { margin: 0; }.project-head p:first-child{color:var(--muted);font-size:.54rem;letter-spacing:.1em;text-transform:uppercase}
   h1{font-size:clamp(3.5rem,7vw,8rem);font-weight:400;letter-spacing:-.09em;line-height:.9;margin:20px 0 28px}.summary{font-size:.9rem;line-height:1.5;max-width:390px}
   .project-head :global(img){display:block;height:auto;width:100%}
   .gallery{display:grid;gap:clamp(30px,8vw,120px);grid-template-columns:repeat(2,1fr);padding:0 clamp(20px,7vw,130px) 180px}

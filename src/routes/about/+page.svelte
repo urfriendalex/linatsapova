@@ -35,7 +35,7 @@
   .portrait :global(.skeleton) { height: 100%; object-fit: cover; outline: 1px solid rgba(0,0,0,.1); width: 100%; }
   .copy { align-self: end; max-width: 620px; padding-bottom: 22px; }
   p,h1 { margin: 0; }
-  .eyebrow { color: var(--muted); font-size: .64rem; letter-spacing: .1em; text-transform: uppercase; }
+  .eyebrow { color: var(--muted); font-size: .54rem; letter-spacing: .1em; text-transform: uppercase; }
   h1 { font-size: clamp(3.2rem,6vw,6.9rem); font-weight: 400; letter-spacing: -.09em; line-height: .9; margin: 24px 0 55px; text-wrap: balance; }
   .bio { font-size: .92rem; line-height: 1.52; max-width: 460px; text-wrap: pretty; }
   .bio p + p { margin-top: 16px; }
