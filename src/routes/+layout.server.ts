@@ -1,5 +1,7 @@
 import { sampleProfile, sampleSiteSettings } from '$lib/sample-data';
-import { getProfile, getSiteSettings } from '$lib/sanity/fetch';
+import { getProfile, getSiteSettings } from '$lib/sanity/fetch.server';
+
+export const prerender = true;
 
 export async function load() {
 	try {

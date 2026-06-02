@@ -4,7 +4,7 @@
   import FocusOverlay from '$lib/components/FocusOverlay.svelte';
   import { destroyLenis, initLenis, resizeLenis, setLenisStopped } from '$lib/lenis';
   import { portfolio } from '$lib/state.svelte';
-  import { sanityConfigured } from '$lib/sanity/client';
+  import { sanityConfigured } from '$lib/sanity/env';
   import { sampleProfile, sampleSiteSettings } from '$lib/sample-data';
 
   const menuLinks = [

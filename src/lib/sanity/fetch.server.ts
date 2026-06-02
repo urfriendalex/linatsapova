@@ -1,6 +1,6 @@
 import type { PortfolioImage, Profile, Project, SiteSettings, WorkCategory } from '$lib/types';
 import { sampleProfile, sampleSiteSettings } from '$lib/sample-data';
-import { sanityClient, sanityConfigured } from './client';
+import { sanityClient, sanityConfigured } from './client.server';
 import { mapPortfolioImage, type SanityPortfolioImage } from './image';
 import {
 	profileQuery,

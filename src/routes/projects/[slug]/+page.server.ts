@@ -1,5 +1,9 @@
 import { error } from '@sveltejs/kit';
-import { getProject } from '$lib/sanity/fetch';
+import { getProject, getProjectSlugs } from '$lib/sanity/fetch.server';
+
+export const prerender = true;
+
+export const entries = async () => (await getProjectSlugs()).map((slug) => ({ slug }));
 
 export async function load({ params }) {
 	const project = await getProject(params.slug);
