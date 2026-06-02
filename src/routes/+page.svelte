@@ -54,12 +54,6 @@
   </div>
 </section>
 
-<footer>
-  <p>For commissions, collaborations, and selected inquiries</p>
-  <a href="mailto:{data.profile.email}">{data.profile.email}</a>
-  <div><span>Instagram</span><span>Threads</span><span>Warsaw</span></div>
-</footer>
-
 <style>
   p,h1,h2 { margin: 0; }
   .hero { display: grid; grid-template-columns: minmax(0,1fr) minmax(360px,.72fr); min-height: calc(100svh - 92px); overflow: hidden; padding: 36px 30px 30px; position: relative; }
@@ -88,10 +82,6 @@
   .category-meta i { font-size: 1.3rem; font-style: normal; transition: transform .22s cubic-bezier(.23,1,.32,1); }
   .category:hover .category-image :global(img), .category:focus-visible .category-image :global(img) { transform: scale(1.035); }
   .category:hover .category-meta i, .category:focus-visible .category-meta i { transform: translate(4px,-4px); }
-  footer { border-top: 1px solid #e4e4df; display: grid; gap: 28px; margin: 0 30px; padding: 28px 0 24px; }
-  footer p, footer div { color: var(--muted); font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; }
-  footer a { font-size: clamp(2.2rem,6vw,7rem); font-weight: 400; letter-spacing: -.09em; line-height: .9; text-decoration: none; width: max-content; }
-  footer div { display: flex; gap: 18px; justify-content: flex-end; }
   @media (hover:hover) and (pointer:fine) { .category-image :global(img) { will-change: transform; } }
   @media (max-width:760px) {
     .hero { display: block; min-height: auto; padding: 54px 20px 20px; }
@@ -104,8 +94,5 @@
     h2 { margin-top: 14px; }
     .category-grid { display: block; }
     .category + .category { margin-top: 64px; }
-    footer { gap: 24px; margin: 0 20px; }
-    footer a { font-size: clamp(1.75rem,8.2vw,3rem); overflow-wrap: anywhere; width: auto; }
-    footer div { justify-content: flex-start; }
   }
 </style>

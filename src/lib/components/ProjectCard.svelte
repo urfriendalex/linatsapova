@@ -52,14 +52,8 @@
     event.preventDefault();
     rememberScroll(location.pathname);
     const cover = card.querySelector('.front') as HTMLElement;
-    cover.style.viewTransitionName = `project-${project.slug}`;
-    const navigate = () => goto(`/projects/${project.slug}`);
-    if (document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      const transition = document.startViewTransition(navigate);
-      transition.finished.finally(() => (cover.style.viewTransitionName = ''));
-    } else {
-      await navigate();
-    }
+    if (cover) cover.style.viewTransitionName = `project-${project.slug}`;
+    await goto(`/projects/${project.slug}`);
   }
 </script>
 

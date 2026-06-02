@@ -1,8 +1,11 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import { afterNavigate } from '$app/navigation';
+  import { afterNavigate, onNavigate } from '$app/navigation';
   import FocusOverlay from '$lib/components/FocusOverlay.svelte';
+  import SiteFooter from '$lib/components/SiteFooter.svelte';
+  import { page } from '$app/state';
   import { destroyLenis, initLenis, resizeLenis, setLenisStopped } from '$lib/lenis';
+  import { runPageTransition } from '$lib/page-transition';
   import { portfolio } from '$lib/state.svelte';
   import { sanityConfigured } from '$lib/sanity/env';
   import { sampleProfile, sampleSiteSettings } from '$lib/sample-data';
@@ -27,6 +30,8 @@
   let menuTimeline: ReturnType<typeof import('gsap').gsap.timeline> | undefined;
 
   const shellExpanded = $derived(menuOpen || menuClosing);
+
+  onNavigate((navigation) => runPageTransition(navigation));
 
   onMount(() => {
     initLenis();
@@ -226,7 +231,7 @@
 <header
   bind:this={menuShell}
   class:expanded={shellExpanded}
-  class="menu-shell"
+  class="menu-shell site-header"
   role="navigation"
   aria-label="Site"
   data-lenis-prevent
@@ -268,7 +273,10 @@
   </div>
 </header>
 
-<main>{@render children()}</main>
+<main class="page-main">{@render children()}</main>
+{#if page.url.pathname !== '/about'}
+  <SiteFooter email={profile.email} instagram={profile.instagram} threads={profile.threads} />
+{/if}
 <FocusOverlay />
 
 <style>
@@ -580,14 +588,44 @@
     font-variant-numeric: tabular-nums;
   }
 
-  main {
-    padding-top: 100px;
+  .site-header {
+    view-transition-name: site-header;
   }
 
-  :global(::view-transition-old(root)),
-  :global(::view-transition-new(root)) {
-    animation-duration: 0.42s;
-    animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+  .page-main {
+    padding-top: 100px;
+    view-transition-name: page-main;
+  }
+
+  :global(::view-transition-old(site-header)),
+  :global(::view-transition-new(site-header)) {
+    animation: none;
+  }
+
+  :global(::view-transition-old(page-main)) {
+    animation: page-fade-out 0.22s cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  :global(::view-transition-new(page-main)) {
+    animation: page-fade-in 0.32s cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  @keyframes page-fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes page-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   @media (max-width: 700px) {
@@ -625,7 +663,7 @@
       padding-bottom: 12px;
     }
 
-    main {
+    .page-main {
       padding-top: 78px;
     }
   }
@@ -660,6 +698,11 @@
 
     .menu-shell:not(.expanded) .footer-item {
       opacity: 0 !important;
+    }
+
+    :global(::view-transition-old(page-main)),
+    :global(::view-transition-new(page-main)) {
+      animation: none !important;
     }
   }
 </style>

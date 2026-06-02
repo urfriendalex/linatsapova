@@ -6,8 +6,8 @@ export const sampleProfile: Profile = {
 	headline: 'Looking for the quieter part of a moment.',
 	bio: 'Lina Tsapova is a photographer and visual artist based in Warsaw. Her work moves between portraiture, landscape, and the architecture of everyday life.\n\nAvailable for editorial commissions, selected commercial projects, and collaborations worldwide.',
 	email: 'tsapovalina@gmail.com',
-	instagram: 'https://instagram.com/',
-	threads: 'https://threads.net/'
+	instagram: 'https://www.instagram.com/lina_tsapova?igsh=NXdvYTFpM2Vxcmc3',
+	threads: 'https://www.threads.com/@lina_tsapova?igshid=NTc4MTIwNjQ2YQ=='
 };
 
 export const sampleSiteSettings: SiteSettings = {
