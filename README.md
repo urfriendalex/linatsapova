@@ -24,4 +24,4 @@ Without Sanity env vars, the site uses sample image data from `src/lib/sample-da
 
 ## Publishing
 
-Deploy the static build to Vercel and configure a Sanity webhook to call the Vercel deploy hook on published document changes.
+Connect the repo to Vercel; pushes to `main` deploy automatically. Optionally add a Sanity webhook → Vercel deploy hook to rebuild when CMS content is published.
