@@ -456,8 +456,20 @@
 
       <div class="focus-chrome">
         <button class="close blend-ui" onclick={close} aria-label="Close image viewer">Close</button>
-        <button class="nav previous blend-ui glyph-arrow" onclick={previous} aria-label="Previous image">←</button>
-        <button class="nav next blend-ui glyph-arrow" onclick={next} aria-label="Next image">→</button>
+        <button class="nav previous blend-ui" onclick={previous} aria-label="Previous image">
+          <span class="arrow-icon nav-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M16 12H8M8 12l6-6M8 12l6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+        </button>
+        <button class="nav next blend-ui" onclick={next} aria-label="Next image">
+          <span class="arrow-icon nav-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 12h8M16 12l-6-6M16 12l-6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+        </button>
         <footer class="focus-footer">
           {#if active.caption}<p class="caption blend-ui">{active.caption}</p>{/if}
           <p class="count blend-ui">{String(index + 1).padStart(2, '0')} / {String(portfolio.gallery.length).padStart(2, '0')}</p>
@@ -590,11 +602,25 @@
     right: 30px;
     top: 26px;
   }
+  .arrow-icon {
+    display: block;
+    line-height: 0;
+  }
+  .arrow-icon svg {
+    display: block;
+    height: 1em;
+    width: 1em;
+  }
   .nav {
-    font-size: 1.2rem;
+    align-items: center;
+    display: flex;
+    justify-content: center;
     padding: 16px;
     top: 50%;
     translate: 0 -50%;
+  }
+  .nav-arrow {
+    font-size: 1.2rem;
   }
   .previous {
     left: 16px;

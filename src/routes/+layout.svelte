@@ -295,11 +295,6 @@
   :global(body) { margin: 0; }
   :global(body.focus-open) { overflow: hidden; }
   :global(a) { color: inherit; }
-  :global(.glyph-arrow) {
-    font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
-    font-style: normal;
-    font-variant-emoji: text;
-  }
 
   .menu-shell {
     --menu-ease: cubic-bezier(0.77, 0, 0.175, 1);
