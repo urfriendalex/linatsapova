@@ -1,6 +1,6 @@
 # Lina Tsapova Portfolio
 
-Static-first SvelteKit portfolio with a persistent client shell, native View Transitions, GSAP gallery interactions, and Sanity Studio schemas.
+SvelteKit portfolio with live Sanity content (server-rendered on each request), a persistent client shell, native View Transitions, GSAP gallery interactions, and Sanity Studio schemas.
 
 ## Local development
 
@@ -20,8 +20,13 @@ Without Sanity env vars, the site uses sample image data from `src/lib/sample-da
    - `SANITY_API_TOKEN` — only needed for `npm run media:upload`
 3. Run Studio locally: `npm run studio`
 4. Add content: **Work category** (modeling, photography), **Profile**, **Site settings**, and optional **Project** documents.
-5. Rebuild the site — pages fetch from Sanity at build time via GROQ.
+5. Deploy to Vercel with `PUBLIC_SANITY_PROJECT_ID` and `PUBLIC_SANITY_DATASET` set in the project environment.
 
 ## Publishing
 
-Connect the repo to Vercel; pushes to `main` deploy automatically. Optionally add a Sanity webhook → Vercel deploy hook to rebuild when CMS content is published.
+Connect the repo to Vercel; pushes to `main` deploy automatically. **CMS updates do not require a redeploy** — when content is published in Sanity, the next page load fetches the latest data via GROQ.
+
+Ensure Vercel has these env vars for Production (and Preview if you use Studio there):
+
+- `PUBLIC_SANITY_PROJECT_ID`
+- `PUBLIC_SANITY_DATASET` (usually `production`)

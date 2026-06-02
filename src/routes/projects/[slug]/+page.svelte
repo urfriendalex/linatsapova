@@ -5,20 +5,10 @@
   import { setFocusImageParam } from '$lib/focus-url';
   import ResponsiveImage from '$lib/components/ResponsiveImage.svelte';
   import { setLightboxSource } from '$lib/lightbox';
-  import { readPrerenderPayload } from '$lib/prerender-payload';
   import { portfolio, syncPortfolioGallery } from '$lib/state.svelte';
-  import type { Project } from '$lib/types';
-
-  const PAYLOAD_ID = 'project-data';
 
   let { data } = $props();
-  let projectState = $state<Project | null>(data?.project ?? readPrerenderPayload<Project>(PAYLOAD_ID));
-  const project = $derived(projectState);
-
-  $effect.pre(() => {
-    if (data?.project) projectState = data.project;
-    else if (!projectState) projectState = readPrerenderPayload<Project>(PAYLOAD_ID);
-  });
+  const project = $derived(data.project);
 
   function syncFromUrl() {
     const id = page.url.searchParams.get('image') ?? '';
@@ -34,7 +24,6 @@
 
   onMount(() => {
     syncPortfolioGallery('.gallery button');
-    if (!project) return;
     portfolio.activeProject = project.slug;
     syncFromUrl();
     const onPopState = () => syncFromUrl();
@@ -47,34 +36,31 @@
   function focus(id: string, event: MouseEvent) {
     syncPortfolioGallery('.gallery button');
     setLightboxSource((event.currentTarget as HTMLButtonElement).querySelector('img') ?? undefined);
+    portfolio.activeProject = project.slug;
     portfolio.transitionPhase = 'opening';
     portfolio.activeImage = id;
     setFocusImageParam(id);
   }
 </script>
 
-<svelte:head><title>{project?.title ?? 'Project'} — Lina Tsapova</title></svelte:head>
+<svelte:head><title>{project.title} — Lina Tsapova</title></svelte:head>
 
-<div id={PAYLOAD_ID} hidden aria-hidden="true">{data?.projectPayload ?? ''}</div>
-
-{#if project}
-  <section class="project-head">
-    <div><p>{project.year} — Project</p><h1>{project.title}</h1><p class="summary">{project.summary}</p></div>
-    <ResponsiveImage image={project.cover} sizes="(max-width: 800px) 100vw, 52vw" eager transitionName={`project-${project.slug}`} />
-  </section>
-  <section class="gallery" aria-label={`${project.title} gallery`}>
-    {#each project.gallery as image, index}
-      <button
-        class:wide={index % 3 === 0}
-        data-image-id={image.id}
-        onclick={(event) => focus(image.id, event)}
-        aria-label={`Explore ${image.alt}`}
-      >
-        <ResponsiveImage {image} sizes={index % 3 === 0 ? '(max-width: 720px) 100vw, 70vw' : '(max-width: 720px) 100vw, 42vw'} />
-      </button>
-    {/each}
-  </section>
-{/if}
+<section class="project-head">
+  <div><p>{project.year} — Project</p><h1>{project.title}</h1><p class="summary">{project.summary}</p></div>
+  <ResponsiveImage image={project.cover} sizes="(max-width: 800px) 100vw, 52vw" eager transitionName={`project-${project.slug}`} />
+</section>
+<section class="gallery" aria-label={`${project.title} gallery`}>
+  {#each project.gallery as image, index}
+    <button
+      class:wide={index % 3 === 0}
+      data-image-id={image.id}
+      onclick={(event) => focus(image.id, event)}
+      aria-label={`Explore ${image.alt}`}
+    >
+      <ResponsiveImage {image} sizes={index % 3 === 0 ? '(max-width: 720px) 100vw, 70vw' : '(max-width: 720px) 100vw, 42vw'} />
+    </button>
+  {/each}
+</section>
 
 <style>
   .project-head { align-items: end; display: grid; gap: 50px; grid-template-columns: 1fr 1.3fr; padding: 100px 30px 150px; }
