@@ -456,8 +456,8 @@
 
       <div class="focus-chrome">
         <button class="close blend-ui" onclick={close} aria-label="Close image viewer">Close</button>
-        <button class="nav previous blend-ui" onclick={previous} aria-label="Previous image">←</button>
-        <button class="nav next blend-ui" onclick={next} aria-label="Next image">→</button>
+        <button class="nav previous blend-ui glyph-arrow" onclick={previous} aria-label="Previous image">←</button>
+        <button class="nav next blend-ui glyph-arrow" onclick={next} aria-label="Next image">→</button>
         <footer class="focus-footer">
           {#if active.caption}<p class="caption blend-ui">{active.caption}</p>{/if}
           <p class="count blend-ui">{String(index + 1).padStart(2, '0')} / {String(portfolio.gallery.length).padStart(2, '0')}</p>

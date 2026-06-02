@@ -23,7 +23,7 @@
         {line}{#if index < landingLines.length - 1}<br />{/if}
       {/each}
     </h1>
-    <a class="explore" href="#works"><span>Explore works</span><i aria-hidden="true">↓</i></a>
+    <a class="explore" href="#works"><span>Explore works</span><i class="glyph-arrow" aria-hidden="true">↓</i></a>
   </div>
   <div class="hero-image">
     <ResponsiveImage image={data.siteSettings.heroImage} sizes="(max-width: 760px) 100vw, 48vw" eager />
@@ -47,7 +47,7 @@
             <small>0{index + 1}</small>
             <strong>{category.title}</strong>
           </span>
-          <i aria-hidden="true">↗</i>
+          <i class="glyph-arrow" aria-hidden="true">↗</i>
         </span>
       </a>
     {/each}
@@ -61,7 +61,7 @@
   .hero-copy p, .section-intro p, .hero-note { color: var(--muted); font-size: .64rem; letter-spacing: .12em; text-transform: uppercase; }
   h1 { font-size: clamp(5rem,12vw,13rem); font-weight: 400; letter-spacing: -.11em; line-height: .79; margin: 24px 0 46px; text-wrap: balance; }
   .explore { align-items: center; display: inline-flex; font-size: .68rem; gap: 14px; letter-spacing: .1em; min-height: 44px; text-decoration: none; text-transform: uppercase; }
-  .explore i { font-size: 1.05rem; font-style: normal; transition: transform .24s cubic-bezier(.23,1,.32,1); }
+  .explore i { font-size: 1.05rem; transition: transform .24s cubic-bezier(.23,1,.32,1); }
   .explore:hover i, .explore:focus-visible i { transform: translateY(5px); }
   .hero-image { min-height: 0; overflow: hidden; }
   .hero-image :global(img),
@@ -79,7 +79,7 @@
   .category-meta span { display: grid; gap: 8px; }
   small { color: var(--muted); font-size: .62rem; font-variant-numeric: tabular-nums; letter-spacing: .08em; }
   strong { font-size: clamp(2rem,3.5vw,4.4rem); font-weight: 400; letter-spacing: -.08em; line-height: .9; }
-  .category-meta i { font-size: 1.3rem; font-style: normal; transition: transform .22s cubic-bezier(.23,1,.32,1); }
+  .category-meta i { font-size: 1.3rem; transition: transform .22s cubic-bezier(.23,1,.32,1); }
   .category:hover .category-image :global(img), .category:focus-visible .category-image :global(img) { transform: scale(1.035); }
   .category:hover .category-meta i, .category:focus-visible .category-meta i { transform: translate(4px,-4px); }
   @media (hover:hover) and (pointer:fine) { .category-image :global(img) { will-change: transform; } }
