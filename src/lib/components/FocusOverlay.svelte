@@ -12,6 +12,7 @@
   const MAX_ZOOM = 3.25;
   /** Keep full image visible above footer / below close */
   const FIT_INSET_Y = 56;
+  const FOCUS_SURFACE = '#f8f8f5';
 
   let active = $derived(portfolio.gallery.find((image) => image.id === portfolio.activeImage));
   let index = $derived(portfolio.gallery.findIndex((image) => image.id === portfolio.activeImage));
@@ -22,7 +23,9 @@
   let viewStage = $state<HTMLDivElement>();
   let mediaWrap = $state<HTMLDivElement>();
   let focusImg = $state<HTMLImageElement>();
+  let previewSrc = $state('');
   let displaySrc = $state('');
+  let fullLoaded = $state(false);
   let openAnimatedId = '';
   let zoomLevel = $state(1);
   let panX = $state(0);
@@ -33,6 +36,12 @@
   let dragStartY = 0;
   let dragPanStartX = 0;
   let dragPanStartY = 0;
+  let pinchStartDistance = 0;
+  let pinchStartZoom = 1;
+  let pinchStartPanX = 0;
+  let pinchStartPanY = 0;
+  let pinchStartMidpoint = { x: 0, y: 0 };
+  const pointers = new Map<number, { x: number; y: number }>();
   let panLayer = $state<HTMLDivElement>();
   let stageSize = $state({ w: 0, h: 0 });
 
@@ -121,7 +130,7 @@
     zoomLevel = 1;
     panX = 0;
     panY = 0;
-    dragging = false;
+    endDrag();
     if (panLayer && gsap) {
       gsap.killTweensOf(panLayer);
       gsap.set(panLayer, { x: 0, y: 0, scale: 1 });
@@ -133,9 +142,15 @@
   async function applyDisplaySrc(src: string) {
     await preloadSrc(src);
     displaySrc = src;
+    fullLoaded = true;
     if (!focusImg) return;
     applyTransform();
     if (focusImg.src !== src) focusImg.src = src;
+  }
+
+  function sourcePreviewSrc(fallback: string) {
+    const source = getLightboxSource();
+    return source?.currentSrc || source?.src || fallback;
   }
 
   function thumbnailButton(imageId: string) {
@@ -152,38 +167,122 @@
     return target instanceof Element && Boolean(target.closest('.view-stage'));
   }
 
+  function clampZoom(value: number) {
+    return gsap ? gsap.utils.clamp(MIN_ZOOM, MAX_ZOOM, value) : Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value));
+  }
+
+  function pointerPair() {
+    const [first, second] = [...pointers.values()];
+    return { first, second };
+  }
+
+  function midpoint(first: { x: number; y: number }, second: { x: number; y: number }) {
+    return { x: (first.x + second.x) / 2, y: (first.y + second.y) / 2 };
+  }
+
+  function distance(first: { x: number; y: number }, second: { x: number; y: number }) {
+    return Math.hypot(second.x - first.x, second.y - first.y);
+  }
+
+  function startDrag(pointer: { x: number; y: number }) {
+    dragging = zoomLevel > 1;
+    dragStartX = pointer.x;
+    dragStartY = pointer.y;
+    dragPanStartX = panX;
+    dragPanStartY = panY;
+  }
+
+  function startPinch() {
+    const { first, second } = pointerPair();
+    if (!first || !second) return;
+    pinchStartDistance = distance(first, second);
+    pinchStartZoom = zoomLevel;
+    pinchStartPanX = panX;
+    pinchStartPanY = panY;
+    pinchStartMidpoint = midpoint(first, second);
+    dragging = false;
+  }
+
   function onPointerMove(event: PointerEvent) {
+    if (!pointers.has(event.pointerId)) return;
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (pointers.size >= 2) {
+      const { first, second } = pointerPair();
+      if (!first || !second || !viewStage || pinchStartDistance <= 0) return;
+      const currentMidpoint = midpoint(first, second);
+      const nextZoom = clampZoom(pinchStartZoom * (distance(first, second) / pinchStartDistance));
+      const scaleChange = nextZoom / pinchStartZoom;
+      const stage = viewStage.getBoundingClientRect();
+      const stageCenterX = stage.left + stage.width / 2;
+      const stageCenterY = stage.top + stage.height / 2;
+      zoomLevel = nextZoom;
+      panX =
+        currentMidpoint.x -
+        stageCenterX -
+        (pinchStartMidpoint.x - stageCenterX - pinchStartPanX) * scaleChange;
+      panY =
+        currentMidpoint.y -
+        stageCenterY -
+        (pinchStartMidpoint.y - stageCenterY - pinchStartPanY) * scaleChange;
+      if (zoomLevel <= 1) {
+        panX = 0;
+        panY = 0;
+      }
+      applyTransform();
+      return;
+    }
     if (!dragging) return;
     panX = dragPanStartX + (event.clientX - dragStartX);
     panY = dragPanStartY + (event.clientY - dragStartY);
     applyTransform();
   }
 
-  function endDrag() {
-    if (!dragging) return;
-    dragging = false;
+  function removePointerListeners() {
     window.removeEventListener('pointermove', onPointerMove);
-    window.removeEventListener('pointerup', endDrag);
-    window.removeEventListener('pointercancel', endDrag);
+    window.removeEventListener('pointerup', onPointerUp);
+    window.removeEventListener('pointercancel', onPointerUp);
+  }
+
+  function onPointerUp(event: PointerEvent) {
+    pointers.delete(event.pointerId);
+    if (pointers.size === 1) {
+      startDrag([...pointers.values()][0]);
+      return;
+    }
+    if (pointers.size > 1) {
+      startPinch();
+      return;
+    }
+    dragging = false;
+    removePointerListeners();
     clampPan();
     applyTransform(true);
   }
 
   function onPointerDown(event: PointerEvent) {
-    if (event.button !== 0 || !isStageTarget(event.target)) return;
+    if ((event.pointerType === 'mouse' && event.button !== 0) || !isStageTarget(event.target)) return;
     if ((event.target as HTMLElement).closest('button')) return;
-    if (zoomLevel <= 1) return;
-
-    dragging = true;
-    dragStartX = event.clientX;
-    dragStartY = event.clientY;
-    dragPanStartX = panX;
-    dragPanStartY = panY;
+    if (event.pointerType === 'mouse' && zoomLevel <= 1) return;
+    const firstPointer = pointers.size === 0;
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     event.preventDefault();
 
-    window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', endDrag);
-    window.addEventListener('pointercancel', endDrag);
+    if (firstPointer) {
+      window.addEventListener('pointermove', onPointerMove);
+      window.addEventListener('pointerup', onPointerUp);
+      window.addEventListener('pointercancel', onPointerUp);
+    }
+    if (pointers.size >= 2) {
+      startPinch();
+    } else {
+      startDrag({ x: event.clientX, y: event.clientY });
+    }
+  }
+
+  function endDrag() {
+    pointers.clear();
+    dragging = false;
+    removePointerListeners();
   }
 
   onMount(() => {
@@ -205,26 +304,41 @@
   });
 
   $effect(() => {
-    document.body.classList.toggle('focus-open', Boolean(active));
+    const isOpen = Boolean(active);
+    const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    const previousThemeColor = themeColor?.content;
+
+    document.documentElement.classList.toggle('focus-open', isOpen);
+    document.body.classList.toggle('focus-open', isOpen);
+    if (isOpen && themeColor) themeColor.content = FOCUS_SURFACE;
     portfolio.transitionPhase = active ? 'open' : 'idle';
-    return () => document.body.classList.remove('focus-open');
+    return () => {
+      document.documentElement.classList.remove('focus-open');
+      document.body.classList.remove('focus-open');
+      if (themeColor && previousThemeColor) themeColor.content = previousThemeColor;
+    };
   });
 
   $effect(() => {
     if (!active) {
       openAnimatedId = '';
+      previewSrc = '';
       displaySrc = '';
+      fullLoaded = false;
       resetView();
       return;
     }
 
     preloadGallery();
+    gsap;
 
-    const source = getLightboxSource();
     const isFirstOpen = openAnimatedId === '';
+    const src = focusSrc(active);
 
     if (isFirstOpen) {
-      displaySrc = source?.currentSrc || source?.src || focusSrc(active);
+      previewSrc = sourcePreviewSrc(src);
+      displaySrc = src;
+      fullLoaded = false;
       void runOpen();
       return;
     }
@@ -232,7 +346,9 @@
     if (openAnimatedId !== active.id) {
       openAnimatedId = active.id;
       resetView();
-      void applyDisplaySrc(focusSrc(active));
+      previewSrc = sourcePreviewSrc(displaySrc || src);
+      displaySrc = src;
+      fullLoaded = false;
     }
   });
 
@@ -240,12 +356,6 @@
     if (!active || !gsap || !overlay || !backdrop || !mediaWrap || !focusImg || !panLayer) return;
 
     await tick();
-    if (!focusImg.complete) {
-      await new Promise<void>((resolve) => {
-        focusImg!.onload = () => resolve();
-        focusImg!.onerror = () => resolve();
-      });
-    }
 
     requestAnimationFrame(() => {
       const g = gsap;
@@ -258,7 +368,6 @@
       const source = getLightboxSource();
       if (!source || reducedMotion()) {
         portfolio.transitionPhase = 'open';
-        void applyDisplaySrc(focusSrc(active));
         return;
       }
 
@@ -295,7 +404,6 @@
           clearProps: 'transform',
           onComplete: () => {
             portfolio.transitionPhase = 'open';
-            void applyDisplaySrc(focusSrc(active));
           }
         }
       );
@@ -329,8 +437,6 @@
     event.preventDefault();
     const delta = event.deltaY > 0 ? -0.14 : 0.14;
     const prevZoom = zoomLevel;
-    const clampZoom = (value: number) =>
-      gsap ? gsap.utils.clamp(MIN_ZOOM, MAX_ZOOM, value) : Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value));
     zoomLevel = clampZoom(zoomLevel + delta);
     if (zoomLevel <= 1) {
       panX = 0;
@@ -440,8 +546,19 @@
             style:height="{fitSize.height}px"
           >
             <img
+              class="focused-image preview-image"
+              src={previewSrc}
+              alt=""
+              aria-hidden="true"
+              width={active.width}
+              height={active.height}
+              decoding="async"
+              draggable="false"
+            />
+            <img
               bind:this={focusImg}
               class="focused-image"
+              class:full-loaded={fullLoaded}
               src={displaySrc}
               alt={active.alt}
               width={active.width}
@@ -449,21 +566,22 @@
               decoding="async"
               fetchpriority="high"
               draggable="false"
+              onload={() => (fullLoaded = true)}
             />
           </div>
         </div>
       </div>
 
-      <div class="focus-chrome">
-        <button class="close blend-ui" onclick={close} aria-label="Close image viewer">Close</button>
-        <button class="nav previous blend-ui" onclick={previous} aria-label="Previous image">
+      <div class="focus-chrome blend-ui">
+        <button class="close" onclick={close} aria-label="Close image viewer">Close</button>
+        <button class="nav previous" onclick={previous} aria-label="Previous image">
           <span class="arrow-icon nav-arrow" aria-hidden="true">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M16 12H8M8 12l6-6M8 12l6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </span>
         </button>
-        <button class="nav next blend-ui" onclick={next} aria-label="Next image">
+        <button class="nav next" onclick={next} aria-label="Next image">
           <span class="arrow-icon nav-arrow" aria-hidden="true">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M8 12h8M16 12l-6-6M16 12l-6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
@@ -471,8 +589,8 @@
           </span>
         </button>
         <footer class="focus-footer">
-          {#if active.caption}<p class="caption blend-ui">{active.caption}</p>{/if}
-          <p class="count blend-ui">{String(index + 1).padStart(2, '0')} / {String(portfolio.gallery.length).padStart(2, '0')}</p>
+          {#if active.caption}<p class="caption">{active.caption}</p>{/if}
+          <p class="count">{String(index + 1).padStart(2, '0')} / {String(portfolio.gallery.length).padStart(2, '0')}</p>
         </footer>
       </div>
     </div>
@@ -486,10 +604,28 @@
     position: fixed;
     z-index: 100;
   }
+  .focus-overlay::before,
+  .focus-overlay::after {
+    background: #f8f8f5;
+    content: '';
+    left: 0;
+    pointer-events: none;
+    position: fixed;
+    right: 0;
+    z-index: 2;
+  }
+  .focus-overlay::before {
+    height: env(safe-area-inset-top, 0px);
+    top: 0;
+  }
+  .focus-overlay::after {
+    bottom: 0;
+    height: env(safe-area-inset-bottom, 0px);
+  }
   .focus-backdrop {
     backdrop-filter: blur(22px) saturate(1.08);
     -webkit-backdrop-filter: blur(22px) saturate(1.08);
-    background: rgba(249, 249, 247, 0.58);
+    background: rgba(110, 110, 110, 0.58);
     inset: 0;
     isolation: isolate;
     position: absolute;
@@ -529,16 +665,26 @@
   }
   .pan-layer {
     flex-shrink: 0;
+    position: relative;
     transform-origin: center center;
     will-change: transform;
   }
   .focused-image {
     display: block;
     height: 100%;
+    inset: 0;
     object-fit: contain;
     pointer-events: none;
+    position: absolute;
     user-select: none;
     width: 100%;
+  }
+  .focused-image:not(.preview-image) {
+    opacity: 0;
+    transition: opacity 0.18s ease;
+  }
+  .focused-image.full-loaded {
+    opacity: 1;
   }
   .focus-chrome {
     inset: 0;
@@ -546,10 +692,12 @@
     position: absolute;
     z-index: 1;
   }
+
   .blend-ui {
     color: #fff;
     mix-blend-mode: difference;
   }
+
   .focus-footer {
     bottom: 22px;
     left: 0;

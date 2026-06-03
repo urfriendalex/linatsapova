@@ -293,7 +293,13 @@
     -webkit-font-smoothing: antialiased;
   }
   :global(body) { margin: 0; }
-  :global(body.focus-open) { overflow: hidden; }
+  :global(html.focus-open),
+  :global(body.focus-open) {
+    background: var(--bg);
+  }
+  :global(body.focus-open) {
+    overflow: hidden;
+  }
   :global(a) { color: inherit; }
 
   .menu-shell {
@@ -556,7 +562,7 @@
     align-items: center;
     color: var(--muted);
     display: flex;
-    font-size: 0.66rem;
+    font-size: clamp(0.54rem, 1.1vw, 0.66rem);
     justify-content: space-between;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -600,31 +606,53 @@
   :global(::view-transition-old(site-header)),
   :global(::view-transition-new(site-header)) {
     animation: none;
+    height: 100%;
+    mix-blend-mode: normal;
+  }
+
+  :global(::view-transition-old(site-header)) {
+    display: none;
+  }
+
+  :global(::view-transition-old(root)),
+  :global(::view-transition-new(root)) {
+    animation: none;
+    mix-blend-mode: normal;
   }
 
   :global(::view-transition-old(page-main)) {
-    animation: page-fade-out 0.22s cubic-bezier(0.2, 0, 0, 1) both;
+    animation: page-leave 0.18s cubic-bezier(0.23, 1, 0.32, 1) both;
+    mix-blend-mode: normal;
   }
 
   :global(::view-transition-new(page-main)) {
-    animation: page-fade-in 0.32s cubic-bezier(0.2, 0, 0, 1) both;
+    animation: page-enter 0.28s cubic-bezier(0.23, 1, 0.32, 1) 0.03s both;
+    mix-blend-mode: normal;
   }
 
-  @keyframes page-fade-out {
+  @keyframes page-leave {
     from {
       opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
     }
     to {
       opacity: 0;
+      transform: translateY(-6px);
+      filter: blur(2px);
     }
   }
 
-  @keyframes page-fade-in {
+  @keyframes page-enter {
     from {
       opacity: 0;
+      transform: translateY(10px);
+      filter: blur(2px);
     }
     to {
       opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
     }
   }
 
@@ -657,7 +685,6 @@
 
     .menu-link {
       font-size: clamp(1.82rem, 8.4vw, 2.52rem);
- 
     }
 
     .menu-body {
@@ -701,9 +728,16 @@
       opacity: 0 !important;
     }
 
+    :global(::view-transition-old(root)),
+    :global(::view-transition-new(root)),
+    :global(::view-transition-old(site-header)),
+    :global(::view-transition-new(site-header)),
     :global(::view-transition-old(page-main)),
     :global(::view-transition-new(page-main)) {
       animation: none !important;
+      display: block;
+      filter: none !important;
+      transform: none !important;
     }
   }
 </style>

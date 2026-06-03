@@ -26,7 +26,10 @@
     <a class="explore" href="#works">
       <span>Explore works</span>
       <span class="arrow-icon explore-arrow" aria-hidden="true">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
+        <svg class="arrow-current" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 7v10M12 17l-5-5M12 17l5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <svg class="arrow-next" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 7v10M12 17l-5-5M12 17l5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </span>
@@ -74,8 +77,13 @@
   .explore { align-items: center; display: inline-flex; font-size: .68rem; gap: 14px; letter-spacing: .1em; min-height: 44px; text-decoration: none; text-transform: uppercase; }
   .arrow-icon { display: block; flex-shrink: 0; line-height: 0; }
   .arrow-icon svg { display: block; height: 1em; width: 1em; }
-  .explore-arrow { font-size: 1.05rem; transition: transform .24s cubic-bezier(.23,1,.32,1); }
-  .explore:hover .explore-arrow, .explore:focus-visible .explore-arrow { transform: translateY(5px); }
+  .explore-arrow { font-size: 1.05rem; height: 1em; overflow: hidden; position: relative; width: 1em; }
+  .explore-arrow svg { left: 0; position: absolute; top: 0; transition: transform .48s cubic-bezier(.76,0,.24,1); }
+  .explore-arrow .arrow-next { transform: translateY(-110%); }
+  .explore:hover .explore-arrow .arrow-current,
+  .explore:focus-visible .explore-arrow .arrow-current { transform: translateY(110%); }
+  .explore:hover .explore-arrow .arrow-next,
+  .explore:focus-visible .explore-arrow .arrow-next { transform: translateY(0); }
   .hero-image { min-height: 0; overflow: hidden; }
   .hero-image :global(img),
   .hero-image :global(.skeleton) { height: 100%; object-fit: cover; outline: 1px solid rgba(0,0,0,.1); width: 100%; }

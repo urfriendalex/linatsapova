@@ -42,8 +42,22 @@
     font-weight: 400;
     letter-spacing: -0.09em;
     line-height: 0.9;
+    position: relative;
     text-decoration: none;
     width: max-content;
+  }
+
+  .site-footer .email::after {
+    background: currentColor;
+    bottom: -0.08em;
+    content: '';
+    height: 0.04em;
+    left: 0.02em;
+    position: absolute;
+    right: 0.1em;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.26s cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   .site-footer div {
@@ -56,8 +70,41 @@
     color: inherit;
     font-size: inherit;
     letter-spacing: inherit;
+    position: relative;
     text-decoration: none;
     text-transform: inherit;
+    transition: color 0.16s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .site-footer div a::after {
+    background: currentColor;
+    bottom: -0.32em;
+    content: '';
+    height: 1px;
+    left: 0;
+    position: absolute;
+    right: 0;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .site-footer .email:hover::after,
+    .site-footer .email:focus-visible::after {
+      transform: scaleX(1);
+    }
+
+    .site-footer div a:hover,
+    .site-footer div a:focus-visible {
+      color: var(--ink);
+    }
+
+    .site-footer div a:hover::after,
+    .site-footer div a:focus-visible::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
   }
 
   @media (max-width: 760px) {
