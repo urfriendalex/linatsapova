@@ -604,23 +604,16 @@
     position: fixed;
     z-index: 100;
   }
-  .focus-overlay::before,
-  .focus-overlay::after {
+  .focus-overlay::before {
     background: #f8f8f5;
     content: '';
+    height: env(safe-area-inset-top, 0px);
     left: 0;
     pointer-events: none;
     position: fixed;
     right: 0;
-    z-index: 2;
-  }
-  .focus-overlay::before {
-    height: env(safe-area-inset-top, 0px);
     top: 0;
-  }
-  .focus-overlay::after {
-    bottom: 0;
-    height: env(safe-area-inset-bottom, 0px);
+    z-index: 2;
   }
   .focus-backdrop {
     backdrop-filter: blur(22px) saturate(1.08);

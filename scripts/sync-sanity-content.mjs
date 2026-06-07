@@ -53,7 +53,10 @@ const client = createClient({
 
 const portfolioImage = (assetId, alt) => ({
 	_type: 'portfolioImage',
-	asset: { _type: 'reference', _ref: assetId },
+	asset: {
+		_type: 'image',
+		asset: { _type: 'reference', _ref: assetId }
+	},
 	alt
 });
 

@@ -300,6 +300,17 @@
   :global(body.focus-open) {
     overflow: hidden;
   }
+  :global(body.focus-open::after) {
+    background: var(--bg);
+    bottom: 0;
+    content: '';
+    height: max(env(safe-area-inset-bottom, 0px), 180px);
+    left: 0;
+    pointer-events: none;
+    position: fixed;
+    right: 0;
+    z-index: 99;
+  }
   :global(a) { color: inherit; }
 
   .menu-shell {
