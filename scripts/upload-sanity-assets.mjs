@@ -37,6 +37,10 @@ const categoryMap = {
 	Ph: { slug: 'photography', title: 'Photography' }
 };
 
+const heroFilename = 'lina-tsapova-modeling-silhouette-hero.jpg';
+const heroAlt =
+	'Seated model in silhouette raising one hand against a softly lit white background';
+
 if (!projectId || !token) {
 	console.error('Set PUBLIC_SANITY_PROJECT_ID and SANITY_API_TOKEN in .env before uploading.');
 	process.exit(1);
@@ -169,22 +173,22 @@ const findAsset = (manifest, filename) =>
 	manifest.find((entry) => entry.filename.toLowerCase() === filename.toLowerCase());
 
 const syncSiteSettings = async (manifest) => {
-	const hero = findAsset(manifest, 'IMG_2497.jpg');
+	const hero = findAsset(manifest, heroFilename);
 	if (!hero) {
-		console.warn('Skipping hero image — IMG_2497.jpg not found in uploaded assets');
+		console.warn(`Skipping hero image — ${heroFilename} not found in uploaded assets`);
 		return;
 	}
 
-	const heroImage = portfolioImage(hero.assetId, 'Editorial portrait in soft light');
+	const heroImage = portfolioImage(hero.assetId, heroAlt);
 	const existing = await client.fetch(`*[_type == "siteSettings"][0]._id`);
 
 	if (existing) {
-		console.log('Updating site settings with hero image (IMG_2497)');
+		console.log(`Updating site settings with hero image (${heroFilename})`);
 		await client.patch(existing).set({ heroImage }).commit();
 		return;
 	}
 
-	console.log('Creating site settings with hero image (IMG_2497)');
+	console.log(`Creating site settings with hero image (${heroFilename})`);
 	await client.create({
 		_type: 'siteSettings',
 		_id: 'siteSettings',

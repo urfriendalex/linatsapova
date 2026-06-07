@@ -57,14 +57,18 @@ const portfolioImage = (assetId, alt) => ({
 	alt
 });
 
+const heroFilename = 'lina-tsapova-modeling-silhouette-hero.jpg';
+const heroAlt =
+	'Seated model in silhouette raising one hand against a softly lit white background';
+
 const findAsset = (filename) =>
 	manifest.find((entry) => entry.filename.toLowerCase() === filename.toLowerCase());
 
-const hero = findAsset('IMG_2497.jpg');
+const hero = findAsset(heroFilename);
 const portrait = findAsset('IMG_7393.jpg');
 
 if (!hero) {
-	console.error('IMG_2497.jpg not found in manifest.');
+	console.error(`${heroFilename} not found in manifest.`);
 	process.exit(1);
 }
 
@@ -73,15 +77,15 @@ if (!portrait) {
 	process.exit(1);
 }
 
-const heroImage = portfolioImage(hero.assetId, 'Editorial portrait in soft light');
+const heroImage = portfolioImage(hero.assetId, heroAlt);
 const portraitImage = portfolioImage(portrait.assetId, 'Portrait of Lina Tsapova');
 
 const siteSettingsId = await client.fetch(`*[_type == "siteSettings"][0]._id`);
 if (siteSettingsId) {
-	console.log('Updating site settings with hero image (IMG_2497)');
+	console.log(`Updating site settings with hero image (${heroFilename})`);
 	await client.patch(siteSettingsId).set({ heroImage }).commit();
 } else {
-	console.log('Creating site settings with hero image (IMG_2497)');
+	console.log(`Creating site settings with hero image (${heroFilename})`);
 	await client.create({
 		_type: 'siteSettings',
 		_id: 'siteSettings',

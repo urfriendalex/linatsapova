@@ -356,6 +356,7 @@
       0 22px 64px rgba(0, 0, 0, 0.1);
     grid-template-rows: var(--chrome-h) minmax(0, 1fr);
     max-height: min(580px, calc(100vh - 120px));
+    overflow: visible;
   }
 
   .menu-chrome {
@@ -516,6 +517,7 @@
 
   .menu-shell.expanded .menu-body {
     max-height: var(--menu-body-max);
+    overflow: visible;
     padding-bottom: var(--chrome-pad-y);
     pointer-events: auto;
     transition:

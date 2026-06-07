@@ -13,7 +13,7 @@
     "media:sync": "node --env-file=.env scripts/sync-sanity-content.mjs",
     "studio": "sanity dev --config sanity.config.ts",
     "studio:login": "sanity login",
-    "studio:deploy": "sanity deploy --config sanity.config.ts"
+    "studio:deploy": "sanity deploy"
   },
   "devDependencies": {
     "@sanity/vision": "^4.10.0",
@@ -22,7 +22,7 @@
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "sanity": "^4.10.0",
+    "sanity": "^5.30.0",
     "svelte": "^5.45.6",
     "svelte-check": "^4.3.4",
     "typescript": "^5.9.3",
