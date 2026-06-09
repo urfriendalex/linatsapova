@@ -4,7 +4,7 @@
   import FocusOverlay from '$lib/components/FocusOverlay.svelte';
   import SiteFooter from '$lib/components/SiteFooter.svelte';
   import { page } from '$app/state';
-  import { destroyLenis, initLenis, resizeLenis, setLenisStopped } from '$lib/lenis';
+  import { destroyLenis, initLenis, resizeLenis, scrollToTop, setLenisStopped } from '$lib/lenis';
   import { runPageTransition } from '$lib/page-transition';
   import { portfolio } from '$lib/state.svelte';
   import { sanityConfigured } from '$lib/sanity/env';
@@ -219,6 +219,15 @@
     closeInFlight = false;
     menuOpen = true;
   }
+
+  function handleNavigationClick(event: MouseEvent, href: string) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (page.url.pathname !== href) return;
+
+    event.preventDefault();
+    scrollToTop();
+    if (menuOpen) void closeMenu();
+  }
 </script>
 
 <svelte:head>
@@ -237,10 +246,10 @@
   data-lenis-prevent
 >
   <div class="menu-chrome">
-    <a class="brand" href="/">Lina Tsapova</a>
+    <a class="brand" href="/" onclick={(event) => handleNavigationClick(event, '/')}>Lina Tsapova</a>
     <nav class="compact-nav" aria-label="Primary">
       {#each menuLinks as link}
-        <a href={link.href}>{link.label}</a>
+        <a href={link.href} onclick={(event) => handleNavigationClick(event, link.href)}>{link.label}</a>
       {/each}
     </nav>
     <button
@@ -258,7 +267,11 @@
   <div class="menu-body" aria-hidden={!shellExpanded}>
     <nav class="menu-links" aria-label="Expanded menu">
       {#each menuLinks as link}
-        <a class="menu-link" href={link.href}>
+        <a
+          class="menu-link"
+          href={link.href}
+          onclick={(event) => handleNavigationClick(event, link.href)}
+        >
           <span class="menu-link-label">{link.label}</span>
         </a>
       {/each}
@@ -292,7 +305,12 @@
     font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-  :global(body) { margin: 0; }
+  :global(html),
+  :global(body) {
+    background: var(--bg);
+    margin: 0;
+    min-height: 100%;
+  }
   :global(html.focus-open),
   :global(body.focus-open) {
     background: var(--bg);
@@ -612,8 +630,14 @@
   }
 
   .page-main {
+    background: var(--bg);
+    min-height: 100svh;
     padding-top: 100px;
     view-transition-name: page-main;
+  }
+
+  :global(::view-transition) {
+    background: var(--bg);
   }
 
   :global(::view-transition-old(site-header)),
@@ -633,39 +657,55 @@
     mix-blend-mode: normal;
   }
 
+  :global(::view-transition-group(page-main)) {
+    animation-duration: 0.56s;
+    animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
+  }
+
   :global(::view-transition-old(page-main)) {
-    animation: page-leave 0.18s cubic-bezier(0.23, 1, 0.32, 1) both;
+    animation: page-leave 0.46s cubic-bezier(0.37, 0, 0.63, 1) both;
+    background: var(--bg);
     mix-blend-mode: normal;
   }
 
   :global(::view-transition-new(page-main)) {
-    animation: page-enter 0.28s cubic-bezier(0.23, 1, 0.32, 1) 0.03s both;
+    animation: page-enter 0.56s cubic-bezier(0.37, 0, 0.63, 1) 0.04s both;
+    background: var(--bg);
     mix-blend-mode: normal;
+  }
+
+  :global(::view-transition-group(work-cover-modeling)),
+  :global(::view-transition-group(work-cover-photography)) {
+    animation-duration: 0.58s;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 2;
+  }
+
+  :global(::view-transition-old(work-cover-modeling)),
+  :global(::view-transition-new(work-cover-modeling)),
+  :global(::view-transition-old(work-cover-photography)),
+  :global(::view-transition-new(work-cover-photography)) {
+    animation-duration: 0.58s;
+    height: 100%;
+    mix-blend-mode: normal;
+    object-fit: cover;
   }
 
   @keyframes page-leave {
     from {
       opacity: 1;
-      transform: translateY(0);
-      filter: blur(0);
     }
     to {
       opacity: 0;
-      transform: translateY(-6px);
-      filter: blur(2px);
     }
   }
 
   @keyframes page-enter {
     from {
       opacity: 0;
-      transform: translateY(10px);
-      filter: blur(2px);
     }
     to {
       opacity: 1;
-      transform: translateY(0);
-      filter: blur(0);
     }
   }
 
@@ -746,7 +786,13 @@
     :global(::view-transition-old(site-header)),
     :global(::view-transition-new(site-header)),
     :global(::view-transition-old(page-main)),
-    :global(::view-transition-new(page-main)) {
+    :global(::view-transition-new(page-main)),
+    :global(::view-transition-group(work-cover-modeling)),
+    :global(::view-transition-group(work-cover-photography)),
+    :global(::view-transition-old(work-cover-modeling)),
+    :global(::view-transition-new(work-cover-modeling)),
+    :global(::view-transition-old(work-cover-photography)),
+    :global(::view-transition-new(work-cover-photography)) {
       animation: none !important;
       display: block;
       filter: none !important;

@@ -39,6 +39,18 @@ export function resizeLenis() {
 	lenis?.resize();
 }
 
+export function scrollToTop() {
+	if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		window.scrollTo({ top: 0, behavior: 'instant' });
+		return;
+	}
+	if (lenis) {
+		lenis.scrollTo(0, { duration: 0.9, force: true });
+		return;
+	}
+	window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 export function scrollToElement(
 	element: Element,
 	options: { immediate?: boolean; offset?: number } = {}

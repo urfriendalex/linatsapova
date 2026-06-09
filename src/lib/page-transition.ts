@@ -1,4 +1,5 @@
 import type { Navigation } from '@sveltejs/kit';
+import { clearPathTransition } from '$lib/path-transition';
 
 export function shouldAnimatePageTransition(navigation: Navigation): boolean {
 	if (typeof document === 'undefined') return false;
@@ -20,9 +21,10 @@ export function runPageTransition(navigation: Navigation): Promise<void> | undef
 	if (!shouldAnimatePageTransition(navigation)) return;
 
 	return new Promise((resolve) => {
-		document.startViewTransition!(async () => {
+		const transition = document.startViewTransition!(async () => {
 			resolve();
 			await navigation.complete;
 		});
+		void transition.finished.finally(clearPathTransition);
 	});
 }
