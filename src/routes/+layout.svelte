@@ -645,18 +645,18 @@
   }
 
   :global(::view-transition-group(page-main)) {
-    animation-duration: 0.42s;
-    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    animation-duration: 0.56s;
+    animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
   }
 
   :global(::view-transition-old(page-main)) {
-    animation: page-leave 0.3s cubic-bezier(0.4, 0, 1, 1) both;
+    animation: page-leave 0.46s cubic-bezier(0.37, 0, 0.63, 1) both;
     background: var(--bg);
     mix-blend-mode: normal;
   }
 
   :global(::view-transition-new(page-main)) {
-    animation: page-enter 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: page-enter 0.56s cubic-bezier(0.37, 0, 0.63, 1) 0.04s both;
     background: var(--bg);
     mix-blend-mode: normal;
   }
