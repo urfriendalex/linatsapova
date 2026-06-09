@@ -5,6 +5,7 @@
   import { page } from '$app/state';
   import ResponsiveImage from '$lib/components/ResponsiveImage.svelte';
   import { setLightboxSource } from '$lib/lightbox';
+  import { pathTransitionName } from '$lib/path-transition';
   import { portfolio, syncPortfolioGallery } from '$lib/state.svelte';
 
   let { data } = $props();
@@ -60,7 +61,7 @@
             {image}
             sizes="(max-width: 700px) 50vw, 25vw"
             eager={index === 0}
-            transitionName={index === 0 ? `work-cover-${slug}` : ''}
+            transitionName={index === 0 ? pathTransitionName(slug) : ''}
           />
         </button>
       {/each}

@@ -1,5 +1,6 @@
 <script lang="ts">
   import ResponsiveImage from '$lib/components/ResponsiveImage.svelte';
+  import { preparePathTransition as setPathTransition } from '$lib/path-transition';
 
   let { data } = $props();
 
@@ -17,6 +18,7 @@
     if (!document.startViewTransition) return;
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+    setPathTransition(slug);
     const image = (event.currentTarget as HTMLAnchorElement).querySelector('img');
     if (image) image.style.viewTransitionName = `work-cover-${slug}`;
   }

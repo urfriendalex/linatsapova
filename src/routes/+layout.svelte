@@ -4,7 +4,7 @@
   import FocusOverlay from '$lib/components/FocusOverlay.svelte';
   import SiteFooter from '$lib/components/SiteFooter.svelte';
   import { page } from '$app/state';
-  import { destroyLenis, initLenis, resizeLenis, setLenisStopped } from '$lib/lenis';
+  import { destroyLenis, initLenis, resizeLenis, scrollToTop, setLenisStopped } from '$lib/lenis';
   import { runPageTransition } from '$lib/page-transition';
   import { portfolio } from '$lib/state.svelte';
   import { sanityConfigured } from '$lib/sanity/env';
@@ -219,6 +219,15 @@
     closeInFlight = false;
     menuOpen = true;
   }
+
+  function handleNavigationClick(event: MouseEvent, href: string) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (page.url.pathname !== href) return;
+
+    event.preventDefault();
+    scrollToTop();
+    if (menuOpen) void closeMenu();
+  }
 </script>
 
 <svelte:head>
@@ -237,10 +246,10 @@
   data-lenis-prevent
 >
   <div class="menu-chrome">
-    <a class="brand" href="/">Lina Tsapova</a>
+    <a class="brand" href="/" onclick={(event) => handleNavigationClick(event, '/')}>Lina Tsapova</a>
     <nav class="compact-nav" aria-label="Primary">
       {#each menuLinks as link}
-        <a href={link.href}>{link.label}</a>
+        <a href={link.href} onclick={(event) => handleNavigationClick(event, link.href)}>{link.label}</a>
       {/each}
     </nav>
     <button
@@ -258,7 +267,11 @@
   <div class="menu-body" aria-hidden={!shellExpanded}>
     <nav class="menu-links" aria-label="Expanded menu">
       {#each menuLinks as link}
-        <a class="menu-link" href={link.href}>
+        <a
+          class="menu-link"
+          href={link.href}
+          onclick={(event) => handleNavigationClick(event, link.href)}
+        >
           <span class="menu-link-label">{link.label}</span>
         </a>
       {/each}
