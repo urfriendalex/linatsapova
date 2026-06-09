@@ -11,6 +11,15 @@
   );
 
   const landingLines = $derived(data.siteSettings.landingStatement.split('\n'));
+
+  function preparePathTransition(event: MouseEvent, slug: string) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (!document.startViewTransition) return;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const image = (event.currentTarget as HTMLAnchorElement).querySelector('img');
+    if (image) image.style.viewTransitionName = `work-cover-${slug}`;
+  }
 </script>
 
 <svelte:head><title>{data.siteSettings.siteTitle}</title></svelte:head>
@@ -48,13 +57,16 @@
   </div>
   <div class="category-grid">
     {#each categories as category, index}
-      <a class="category" href={`/work/${category.slug}`}>
+      <a
+        class="category"
+        href={`/work/${category.slug}`}
+        onclick={(event) => preparePathTransition(event, category.slug)}
+      >
         <span class="category-image">
           <ResponsiveImage
             image={category.image}
             sizes="(max-width: 760px) 100vw, 50vw"
             eager={index === 0}
-            transitionName={`work-cover-${category.slug}`}
           />
         </span>
         <span class="category-meta">
