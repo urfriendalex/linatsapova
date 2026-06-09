@@ -50,7 +50,12 @@
     {#each categories as category, index}
       <a class="category" href={`/work/${category.slug}`}>
         <span class="category-image">
-          <ResponsiveImage image={category.image} sizes="(max-width: 760px) 100vw, 50vw" eager={index === 0} />
+          <ResponsiveImage
+            image={category.image}
+            sizes="(max-width: 760px) 100vw, 50vw"
+            eager={index === 0}
+            transitionName={`work-cover-${category.slug}`}
+          />
         </span>
         <span class="category-meta">
           <span>

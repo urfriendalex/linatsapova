@@ -54,9 +54,14 @@
   </header>
   <div class="grid" aria-label={category.title}>
     {#if category.images?.length}
-      {#each category.images as image}
+      {#each category.images as image, index}
         <button data-image-id={image.id} onclick={(event) => focus(image.id, event)} aria-label={`Explore ${image.alt}`}>
-          <ResponsiveImage {image} sizes="(max-width: 700px) 50vw, 25vw" />
+          <ResponsiveImage
+            {image}
+            sizes="(max-width: 700px) 50vw, 25vw"
+            eager={index === 0}
+            transitionName={index === 0 ? `work-cover-${slug}` : ''}
+          />
         </button>
       {/each}
     {/if}
